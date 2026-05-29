@@ -3,6 +3,7 @@ from app.crawler import crawl_site
 
 jobs = {}
 next_job_id = 1
+job_queue = []
 
 app = FastAPI()
 
@@ -29,16 +30,16 @@ def create_job(url: str, limit: int = 5):
 
     global next_job_id
 
-    pages = crawl_site(url, page_limit=limit)
-
     job = {
-        "job_id": next_job_id,
-        "status": "completed",
-        "pages_crawled": len(pages),
-        "pages": pages
-    }
+    "job_id": next_job_id,
+    "status": "queued",
+    "url": url,
+    "limit": limit,
+    "pages": []
+}
 
     jobs[next_job_id] = job
+    job_queue.append(next_job_id)
 
     next_job_id += 1
 
@@ -57,3 +58,25 @@ def get_pages(job_id: int):
         return {"error": "Job not found"}
 
     return job["pages"]
+
+
+@app.post("/process-next-job")
+def process_next_job():
+
+    if not job_queue:
+        return {"message": "No jobs in queue"}
+
+    job_id = job_queue.pop(0)
+
+    job = jobs[job_id]
+
+    pages = crawl_site(
+        job["url"],
+        page_limit=job["limit"]
+    )
+
+    job["status"] = "completed"
+    job["pages"] = pages
+    job["pages_crawled"] = len(pages)
+
+    return job
