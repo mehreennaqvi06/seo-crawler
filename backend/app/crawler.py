@@ -1,6 +1,7 @@
 import httpx
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
+from datetime import datetime
 
 def crawl_site(start_url, page_limit=5):
 
@@ -42,7 +43,8 @@ def crawl_site(start_url, page_limit=5):
                 "title": title,
                 "h1": h1_text,
                 "meta_description": meta_desc,
-                "status_code": response.status_code
+                "status_code": response.status_code,
+                "timestamp": datetime.utcnow().isoformat()
             })
 
             visited.add(current_url)
