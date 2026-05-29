@@ -3,10 +3,30 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 from datetime import datetime
 
+def get_disallowed_paths(start_url):
+    try:
+        robots_url = urljoin(start_url, "/robots.txt")
+
+        response = httpx.get(robots_url, timeout=10)
+
+        disallowed = []
+
+        for line in response.text.splitlines():
+            if line.startswith("Disallow:"):
+                path = line.replace("Disallow:", "").strip()
+                if path:
+                    disallowed.append(path)
+
+        return disallowed
+
+    except Exception:
+        return []
+
 def crawl_site(start_url, page_limit=5):
 
     # BFS queue for graph traversal
     queue = [start_url]
+    disallowed_paths = get_disallowed_paths(start_url)
     base_domain = urlparse(start_url).netloc
     visited = set()
     results = []
@@ -84,6 +104,16 @@ def crawl_site(start_url, page_limit=5):
                 ).netloc
 
                 if link_domain != base_domain:
+                    continue
+                
+                blocked = False
+
+                for path in disallowed_paths:
+                    if urlparse(absolute_url).path.startswith(path):
+                        blocked = True
+                        break
+
+                if blocked:
                     continue
 
                 if absolute_url not in visited:
