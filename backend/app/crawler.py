@@ -5,6 +5,7 @@ from datetime import datetime
 
 def crawl_site(start_url, page_limit=5):
 
+    # BFS queue for graph traversal
     queue = [start_url]
     base_domain = urlparse(start_url).netloc
     visited = set()
@@ -12,13 +13,22 @@ def crawl_site(start_url, page_limit=5):
 
     while queue and len(visited) < page_limit:
 
+        # Process URLs in FIFO order (BFS)
         current_url = queue.pop(0)
-
+        
         if current_url in visited:
             continue
 
         try:
-            response = httpx.get(current_url, timeout=10)
+            headers = {
+                "User-Agent": "SEO-Crawler-Bot/1.0"
+            }
+
+            response = httpx.get(
+                current_url,
+                headers=headers,
+                timeout=10
+            )
 
             soup = BeautifulSoup(response.text, "html.parser")
 
