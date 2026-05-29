@@ -22,6 +22,9 @@ Intern task implementation using:
 
 Currently implemented:
 
-- GET /
-- GET /test
-- GET /crawl
+GET /
+GET /test
+GET /crawl
+POST /jobs
+GET /jobs/{id}
+GET /jobs/{id}/pages
