@@ -37,7 +37,9 @@ def create_job(url: str, limit: int = 5):
     "status": "queued",
     "url": url,
     "limit": limit,
-    "pages": []
+    "pages": [],
+    "allowed": [],
+    "disallowed": [],
 }
 
     jobs[next_job_id] = job
@@ -78,8 +80,12 @@ def process_next_job():
     )
 
     job["status"] = "completed"
-    job["pages"] = pages
-    job["pages_crawled"] = len(pages)
+    
+    job["pages"] = pages["pages"]
+    job["allowed"] = pages["allowed"]
+    job["disallowed"] = pages["disallowed"]
+    
+    job["pages_crawled"] = len(pages["pages"])
 
     return job
 

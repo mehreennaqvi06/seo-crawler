@@ -37,6 +37,7 @@ def crawl_site(start_url, page_limit=5):
     base_domain = urlparse(start_url).netloc
     visited = set()
     results = []
+    allowed_slugs = []
 
     while queue and len(visited) < page_limit:
 
@@ -85,6 +86,10 @@ def crawl_site(start_url, page_limit=5):
             })
 
             visited.add(current_url)
+            
+            allowed_slugs.append(
+                urlparse(current_url).path or "/"
+            )
 
             links = soup.find_all("a")
 
@@ -129,4 +134,8 @@ def crawl_site(start_url, page_limit=5):
         except Exception:
             pass
 
-    return results
+    return {
+        "pages": results,
+        "allowed": allowed_slugs,
+        "disallowed": disallowed_paths
+    }
