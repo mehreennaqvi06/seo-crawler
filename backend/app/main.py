@@ -5,6 +5,8 @@ jobs = {}
 next_job_id = 1
 job_queue = []
 
+crawl_rules = {}
+
 app = FastAPI()
 
 @app.get("/")
@@ -80,3 +82,10 @@ def process_next_job():
     job["pages_crawled"] = len(pages)
 
     return job
+
+@app.get("/robots-rules")
+def robots_rules(url: str):
+
+    from app.crawler import get_disallowed_paths
+
+    return get_disallowed_paths(url)

@@ -17,16 +17,23 @@ def get_disallowed_paths(start_url):
                 if path:
                     disallowed.append(path)
 
-        return disallowed
+        return {
+            "disallowed": disallowed
+        }
 
     except Exception:
-        return []
+        return {
+            "disallowed": []
+        }
 
 def crawl_site(start_url, page_limit=5):
 
     # BFS queue for graph traversal
     queue = [start_url]
-    disallowed_paths = get_disallowed_paths(start_url)
+    robots_data = get_disallowed_paths(start_url)
+
+    disallowed_paths = robots_data["disallowed"]
+
     base_domain = urlparse(start_url).netloc
     visited = set()
     results = []
