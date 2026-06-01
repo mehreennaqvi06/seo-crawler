@@ -38,6 +38,7 @@ def crawl_site(start_url, page_limit=5):
     visited = set()
     results = []
     error_count = 0
+    retry_count = 0
     allowed_slugs = []
 
     while queue and len(visited) < page_limit:
@@ -53,11 +54,21 @@ def crawl_site(start_url, page_limit=5):
                 "User-Agent": "SEO-Crawler-Bot/1.0"
             }
 
-            response = httpx.get(
-                current_url,
-                headers=headers,
-                timeout=10
-            )
+            response = None
+
+            for attempt in range(3):
+                try:
+                    response = httpx.get(
+                        current_url,
+                        headers=headers,
+                        timeout=10
+                    )
+                    break
+                except Exception:
+                    retry_count += 1
+
+            if response is None:
+                raise Exception("Failed after retries")
 
             soup = BeautifulSoup(response.text, "html.parser")
 
@@ -139,5 +150,6 @@ def crawl_site(start_url, page_limit=5):
         "pages": results,
         "allowed": allowed_slugs,
         "disallowed": disallowed_paths,
-        "error_count": error_count
+        "error_count": error_count,
+        "retry_count": retry_count
     }

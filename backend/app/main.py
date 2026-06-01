@@ -113,7 +113,8 @@ def process_next_job():
         "completed",
         len(pages["pages"]),
         crawl_duration,
-        pages["error_count"]
+        pages["error_count"],
+        pages["retry_count"]
     )
 
     return job

@@ -33,7 +33,8 @@ def update_job_db(
     status,
     pages_crawled,
     crawl_duration,
-    error_count
+    error_count,
+    retry_count
 ):
     conn = get_connection()
     cur = conn.cursor()
@@ -45,6 +46,7 @@ def update_job_db(
             pages_crawled = %s,
             crawl_duration_seconds = %s,
             error_count = %s,
+            retry_count = %s,
             completed_at = CURRENT_TIMESTAMP
         WHERE id = %s
         """,
@@ -53,6 +55,7 @@ def update_job_db(
             pages_crawled,
             crawl_duration,
             error_count,
+            retry_count,
             job_id
         )
     )
@@ -106,6 +109,7 @@ def get_metrics_db():
             COUNT(*) FILTER (WHERE status = 'queued') AS queued_jobs,
             COALESCE(SUM(pages_crawled), 0) AS total_pages_crawled,
             COALESCE(SUM(error_count), 0) AS total_errors,
+            COALESCE(SUM(retry_count), 0) AS total_retries,
             COALESCE(AVG(crawl_duration_seconds), 0) AS average_crawl_duration
         FROM jobs
     """)
@@ -121,7 +125,8 @@ def get_metrics_db():
         "queued_jobs": row[2],
         "total_pages_crawled": row[3],
         "total_errors": row[4],
-        "average_crawl_duration": float(row[5])
+        "total_retries": row[5],
+        "average_crawl_duration": float(row[6])
     }
     
 def get_all_jobs_db():
