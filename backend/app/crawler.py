@@ -37,6 +37,7 @@ def crawl_site(start_url, page_limit=5):
     base_domain = urlparse(start_url).netloc
     visited = set()
     results = []
+    error_count = 0
     allowed_slugs = []
 
     while queue and len(visited) < page_limit:
@@ -132,10 +133,11 @@ def crawl_site(start_url, page_limit=5):
                     queue.append(absolute_url)
 
         except Exception:
-            pass
+            error_count += 1
 
     return {
         "pages": results,
         "allowed": allowed_slugs,
-        "disallowed": disallowed_paths
+        "disallowed": disallowed_paths,
+        "error_count": error_count
     }

@@ -1,5 +1,13 @@
+import time
 from fastapi import FastAPI
 from app.crawler import crawl_site
+from app.database import (
+    create_job_db,
+    update_job_db,
+    save_page_db,
+    get_metrics_db,
+    get_all_jobs_db
+)
 
 jobs = {}
 next_job_id = 1
@@ -32,20 +40,20 @@ def create_job(url: str, limit: int = 5):
 
     global next_job_id
 
+    db_job_id = create_job_db(url, "queued")
+
     job = {
-    "job_id": next_job_id,
-    "status": "queued",
-    "url": url,
-    "limit": limit,
-    "pages": [],
-    "allowed": [],
-    "disallowed": [],
-}
+        "job_id": db_job_id,
+        "status": "queued",
+        "url": url,
+        "limit": limit,
+        "pages": [],
+        "allowed": [],
+        "disallowed": []
+    }
 
-    jobs[next_job_id] = job
-    job_queue.append(next_job_id)
-
-    next_job_id += 1
+    jobs[db_job_id] = job
+    job_queue.append(db_job_id)
 
     return job
 
@@ -74,6 +82,8 @@ def process_next_job():
 
     job = jobs[job_id]
 
+    start_time = time.time()
+    
     pages = crawl_site(
         job["url"],
         page_limit=job["limit"]
@@ -81,11 +91,30 @@ def process_next_job():
 
     job["status"] = "completed"
     
-    job["pages"] = pages["pages"]
+    for page in pages["pages"]:
+
+        save_page_db(
+            job_id,
+            page["url"],
+            page["title"],
+            page["h1"],
+            page["meta_description"],
+            page["status_code"]
+        )
     job["allowed"] = pages["allowed"]
     job["disallowed"] = pages["disallowed"]
     
     job["pages_crawled"] = len(pages["pages"])
+    
+    crawl_duration = time.time() - start_time
+    
+    update_job_db(
+        job_id,
+        "completed",
+        len(pages["pages"]),
+        crawl_duration,
+        pages["error_count"]
+    )
 
     return job
 
@@ -95,3 +124,11 @@ def robots_rules(url: str):
     from app.crawler import get_disallowed_paths
 
     return get_disallowed_paths(url)
+
+@app.get("/metrics")
+def get_metrics():
+    return get_metrics_db()
+
+@app.get("/jobs")
+def get_jobs():
+    return get_all_jobs_db()
