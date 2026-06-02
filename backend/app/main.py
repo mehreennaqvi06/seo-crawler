@@ -1,5 +1,6 @@
 import time
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.crawler import crawl_site
 from app.database import (
     create_job_db,
@@ -16,6 +17,14 @@ job_queue = []
 crawl_rules = {}
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def home():
@@ -81,6 +90,8 @@ def process_next_job():
     job_id = job_queue.pop(0)
 
     job = jobs[job_id]
+    
+    job["status"] = "running"
 
     start_time = time.time()
     
@@ -103,6 +114,8 @@ def process_next_job():
         )
     job["allowed"] = pages["allowed"]
     job["disallowed"] = pages["disallowed"]
+    
+    job["pages"] = pages["pages"]
     
     job["pages_crawled"] = len(pages["pages"])
     
