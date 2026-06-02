@@ -7,6 +7,7 @@ function App() {
   const [jobId, setJobId] = useState<number | null>(null);
   const [status, setStatus] = useState("");
   const [pages, setPages] = useState<any[]>([]);
+  const [progress, setProgress] = useState(0);
 
   const startCrawl = async () => {
     try {
@@ -42,7 +43,16 @@ function App() {
 
     setStatus(response.data.status);
 
+    if (response.data.status === "queued") {
+      setProgress(25);
+    }
+
+    if (response.data.status === "running") {
+      setProgress(75);
+    }
+
     if (response.data.status === "completed") {
+      setProgress(100);
       loadPages();
     }
   };
@@ -55,6 +65,14 @@ function App() {
     );
 
     setPages(response.data);
+  };
+
+  const sortByStatus = () => {
+    const sorted = [...pages].sort(
+      (a, b) => a.status_code - b.status_code
+    );
+
+    setPages(sorted);
   };
 
   useEffect(() => {
@@ -112,8 +130,20 @@ function App() {
         <p>Status: {status}</p>
       )}
 
+      <div style={{ width: "400px", margin: "20px auto" }}>
+        <progress value={progress} max="100" style={{ width: "100%" }} />
+        <p>{progress}%</p>
+      </div>
+      
+      
+
       {pages.length > 0 && (
-        <table border={1}>
+        <>
+          <button onClick={sortByStatus}>
+            Sort by Status Code
+          </button>
+
+          <table border={1}>
           <thead>
             <tr>
               <th>URL</th>
@@ -133,8 +163,9 @@ function App() {
               </tr>
             ))}
           </tbody>
-        </table>
-      )}
+          </table>
+  </>
+)}
 
     </div>
   );
