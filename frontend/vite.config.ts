@@ -8,8 +8,6 @@ export default defineConfig({
   },
   preview: {
     host: "0.0.0.0",
-    allowedHosts: [
-      "seo-crawler-production-37d1.up.railway.app"
-    ]
+    allowedHosts: true
   }
 });
