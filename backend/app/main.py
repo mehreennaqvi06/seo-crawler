@@ -1,8 +1,8 @@
 import time
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.crawler import crawl_site
-from app.database import (
+from crawler import crawl_site
+from database import (
     create_job_db,
     update_job_db,
     save_page_db,
