@@ -66,6 +66,8 @@ def create_job(url: str, limit: int = 5):
 
     jobs[db_job_id] = job
     job_queue.append(db_job_id)
+    
+    process_next_job()
 
     return job
 

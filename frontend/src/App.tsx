@@ -12,7 +12,7 @@ function App() {
   const startCrawl = async () => {
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/jobs",
+        "https://seo-crawler-production-b521.up.railway.app/jobs",
         null,
         {
           params: {
@@ -36,7 +36,7 @@ function App() {
     if (!jobId) return;
 
     const response = await axios.get(
-      `http://127.0.0.1:8000/jobs/${jobId}`
+      `https://seo-crawler-production-b521.up.railway.app/jobs/${jobId}`
     );
 
     console.log(response.data);
@@ -61,7 +61,7 @@ function App() {
     if (!jobId) return;
 
     const response = await axios.get(
-      `http://127.0.0.1:8000/jobs/${jobId}/pages`
+      `https://seo-crawler-production-b521.up.railway.app/jobs/${jobId}/pages`
     );
 
     setPages(response.data);
