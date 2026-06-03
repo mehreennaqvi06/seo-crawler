@@ -1,38 +1,43 @@
-# Graph Traversal Used in the Crawler
+# Graph Traversal Used
 
-## Overview
+## Approach
 
-The crawler models a website as a graph.
+The crawler uses Breadth First Search (BFS) to traverse pages within a website.
 
-- Each webpage is treated as a node.
-- Each hyperlink between pages is treated as an edge.
+Each page is treated as a node in a graph.
+Each hyperlink between pages is treated as an edge.
 
-## Traversal Method
+A queue is used to maintain the BFS traversal order.
 
-The crawler uses Breadth First Search (BFS).
+## Why BFS?
 
-Implementation details:
+BFS explores pages level by level from the starting URL.
 
-- A queue is used to store URLs waiting to be crawled.
-- The first URL added to the queue is processed first.
-- Newly discovered URLs are added to the end of the queue.
-- Visited URLs are tracked to prevent revisiting the same page.
+Advantages:
 
-## Why BFS
+- Finds nearby pages first.
+- Prevents deep traversal into a single section.
+- Easy to enforce page limits.
+- Commonly used by search engine crawlers.
 
-BFS explores pages level by level starting from the seed URL.
+## Algorithm
 
-For example:
+1. Add starting URL to queue.
+2. Pop URL from queue.
+3. Visit page and extract links.
+4. Add unvisited internal links to queue.
+5. Repeat until queue is empty or page limit reached.
 
-Home
-├── About
-├── Blog
-└── Contact
+## Time Complexity
 
-The crawler visits:
+O(V + E)
 
-1. Home
-2. About, Blog, Contact
-3. Links discovered from those pages
+Where:
+- V = number of pages
+- E = number of links
 
-This approach is commonly used in web crawling because it provides broad coverage of a site while avoiding deep traversal into a single path.
+## Data Structures
+
+- Queue
+- Visited Set
+- Results List

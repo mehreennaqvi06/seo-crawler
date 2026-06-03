@@ -65,3 +65,17 @@ Steps:
 3. Extract links.
 4. Add unseen links to queue.
 5. Continue until page limit is reached.
+
+## Design Patterns Used
+
+### Queue Pattern
+
+A queue is used for crawl job processing. Jobs are added when created and processed in FIFO order. This allows future support for multiple concurrent crawl requests.
+
+### Repository Pattern
+
+Database operations are separated from API logic through helper functions in database.py. This keeps persistence logic isolated and easier to maintain.
+
+### Builder Pattern
+
+Each crawl result is assembled into a structured page object containing URL, title, H1, meta description, status code and timestamp before storage.
