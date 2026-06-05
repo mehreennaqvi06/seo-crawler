@@ -11,6 +11,12 @@ function App() {
   const [progress, setProgress] = useState(0);
 
   const startCrawl = async () => {
+
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      alert("Please enter a valid URL");
+      return;
+    }
+
     try {
       const response = await axios.post(
         "https://seo-crawler-production-b521.up.railway.app/jobs",
