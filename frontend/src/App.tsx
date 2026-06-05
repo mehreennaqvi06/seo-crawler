@@ -117,23 +117,29 @@ function App() {
 
       <br />
 
-      <button onClick={startCrawl}>Start Crawl</button>
+      <button className="primary-btn" onClick={startCrawl}>
+        Start Crawl
+      </button>
 
-      <button onClick={checkStatus}>
+      <button className="secondary-btn" onClick={checkStatus}>
         Check Status
       </button>
 
       {jobId && (
-        <p>Job ID: {jobId}</p>
-      )}
-
-      {status && (
-        <p>Status: {status}</p>
+        <div className="status-card">
+          <p><strong>Job ID:</strong> {jobId}</p>
+          <p><strong>Status:</strong> {status}</p>
+        </div>
       )}
 
       <div style={{ width: "400px", margin: "20px auto" }}>
-        <progress value={progress} max="100" style={{ width: "100%" }} />
-        <p>{progress}%</p>
+       <div className="progress-container">
+          <div
+            className="progress-bar"
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+        <p className="progress-text">{progress}%</p>
       </div>
       
       
@@ -144,7 +150,7 @@ function App() {
             Sort by Status Code
           </button>
 
-          <table border={1}>
+          <table>
           <thead>
             <tr>
               <th>URL</th>
