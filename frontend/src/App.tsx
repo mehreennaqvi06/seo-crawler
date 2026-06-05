@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import "./App.css";
 
 function App() {
   const [url, setUrl] = useState("");
@@ -86,17 +87,17 @@ function App() {
   }, [jobId]);
 
   return (
-    <div style={{ padding: "40px" }}>
-      <h1>SEO Crawler</h1>
+    <div className="container">
+      <h1 className="title">SEO Crawler</h1>
 
       <div>
         <label>URL:</label>
         <input
+          className="url-input"
           type="text"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://example.com"
-          style={{ marginLeft: "10px", width: "400px" }}
         />
       </div>
 
@@ -172,3 +173,4 @@ function App() {
 }
 
 export default App;
+
