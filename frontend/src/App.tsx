@@ -13,9 +13,9 @@ function App() {
   const startCrawl = async () => {
 
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
-      alert("Please enter a valid URL");
-      return;
-    }
+    alert("Please enter a valid URL");
+    return;
+  }
 
     try {
       const response = await axios.post(
@@ -127,7 +127,11 @@ function App() {
         Start Crawl
       </button>
 
-      <button className="secondary-btn" onClick={checkStatus}>
+      <button
+        className="secondary-btn"
+        onClick={checkStatus}
+        disabled={!jobId}
+      >
         Check Status
       </button>
 
