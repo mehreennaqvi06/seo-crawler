@@ -95,6 +95,9 @@ function App() {
   return (
     <div className="container">
       <h1 className="title">SEO Crawler</h1>
+      <p className="subtitle">
+        Analyze website pages, metadata and crawl results in real time
+      </p>
 
       <div>
         <label>URL:</label>
@@ -136,14 +139,28 @@ function App() {
       </button>
 
       {jobId && (
-        <div className="status-card">
-          <p><strong>Job ID:</strong> {jobId}</p>
-          <p><strong>Status:</strong> {status}</p>
+        <div className="stats-grid">
+
+          <div className="stat-card">
+            <h3>Job ID</h3>
+            <p>{jobId}</p>
+          </div>
+
+          <div className="stat-card">
+            <h3>Status</h3>
+            <p>{status}</p>
+          </div>
+
+          <div className="stat-card">
+            <h3>Pages</h3>
+            <p>{pages.length}</p>
+          </div>
+
         </div>
       )}
 
       <div style={{ width: "400px", margin: "20px auto" }}>
-       <div className="progress-container">
+        <div className="progress-container">
           <div
             className="progress-bar"
             style={{ width: `${progress}%` }}
@@ -151,8 +168,6 @@ function App() {
         </div>
         <p className="progress-text">{progress}%</p>
       </div>
-      
-      
 
       {pages.length > 0 && (
         <>
