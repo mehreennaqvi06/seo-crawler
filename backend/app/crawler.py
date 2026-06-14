@@ -61,8 +61,15 @@ def crawl_site(start_url, page_limit=5):
                     response = httpx.get(
                         current_url,
                         headers=headers,
-                        timeout=10
+                        timeout=10,
+                        follow_redirects=True
                     )
+                    
+                    print("CURRENT:", current_url)
+                    print("FINAL:", response.url)
+                    print("STATUS:", response.status_code)
+                    print("----------------")
+                    
                     break
                 except Exception:
                     retry_count += 1
@@ -75,7 +82,12 @@ def crawl_site(start_url, page_limit=5):
             title = soup.title.string if soup.title else ""
 
             h1 = soup.find("h1")
-            h1_text = h1.text.strip() if h1 else ""
+
+            if h1:
+                h1_text = h1.get_text(separator=" ", strip=True)
+                h1_text = h1_text.replace("¶", "")
+            else:
+                h1_text = ""
 
             meta = soup.find(
                 "meta",
@@ -89,7 +101,7 @@ def crawl_site(start_url, page_limit=5):
             )
 
             results.append({
-                "url": current_url,
+                "url": str(response.url),
                 "title": title,
                 "h1": h1_text,
                 "meta_description": meta_desc,
