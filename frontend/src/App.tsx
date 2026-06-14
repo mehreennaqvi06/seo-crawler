@@ -92,96 +92,159 @@ function App() {
     return () => clearInterval(interval);
   }, [jobId]);
 
-  return (
-    <div className="container">
-      <h1 className="title">SEO Crawler</h1>
-      <p className="subtitle">
-        Analyze website pages, metadata and crawl results in real time
+ return (
+  <div className="app">
+
+    <div className="hero">
+
+      <div className="logo">
+        SEO Crawler
+      </div>
+
+      <div className="badge">
+        ✨ AI Powered SEO Analysis
+      </div>
+
+      <h1 className="hero-title">
+        Scan your website
+      </h1>
+
+      <p className="hero-subtitle">
+        Analyze pages, metadata, headings and crawl performance
+        in real time.
       </p>
 
-      <div>
-        <label>URL:</label>
-        <input
-          className="url-input"
-          type="text"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://example.com"
-        />
-      </div>
+    </div>
 
-      <br />
+    <div className="scan-card">
 
-      <div>
-        <label>Page Limit: {limit}</label>
-        <br />
-        <input
-          type="range"
-          min="1"
-          max="100"
-          value={limit}
-          onChange={(e) => setLimit(Number(e.target.value))}
-        />
-      </div>
+      <label className="input-label">
+        Website URL
+      </label>
 
-      <br />
+      <input
+        className="url-input"
+        type="text"
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+        placeholder="https://example.com"
+      />
 
-      <button className="primary-btn" onClick={startCrawl}>
-        Start Crawl
-      </button>
+      <div className="limit-section">
 
-      <button
-        className="secondary-btn"
-        onClick={checkStatus}
-        disabled={!jobId}
-      >
-        Check Status
-      </button>
+  <p>Page Limit: {limit}</p>
 
-      {jobId && (
-        <div className="stats-grid">
+  <input
+    type="range"
+    min="1"
+    max="100"
+    value={limit}
+    onChange={(e) => setLimit(Number(e.target.value))}
+  />
 
-          <div className="stat-card">
-            <h3>Job ID</h3>
-            <p>{jobId}</p>
-          </div>
+</div>
 
-          <div className="stat-card">
-            <h3>Status</h3>
-            <p>{status}</p>
-          </div>
+      <div className="button-group">
 
-          <div className="stat-card">
-            <h3>Pages</h3>
-            <p>{pages.length}</p>
-          </div>
+  <button
+    className="crawl-btn"
+    onClick={startCrawl}
+  >
+    Analyze Website →
+  </button>
 
+  <button
+    className="status-btn"
+    onClick={checkStatus}
+    disabled={!jobId}
+  >
+    Check Status
+  </button>
+
+</div>
+    
+    <div className="progress-section-card">
+
+  <div className="progress-container">
+    <div
+      className="progress-bar"
+      style={{ width: `${progress}%` }}
+    />
+  </div>
+
+  <p className="progress-label">
+    {progress}% Complete
+  </p>
+
+</div>
+
+    </div>
+
+    {jobId && (
+      <div className="stats-grid">
+
+        <div className="stat-card">
+          <h4>Job ID</h4>
+          <span>{jobId}</span>
         </div>
-      )}
 
-      <div style={{ width: "400px", margin: "20px auto" }}>
+        <div className="stat-card">
+          <h4>Status</h4>
+          <span className={`status-${status}`}>
+            {status || "Waiting"}
+          </span>
+        </div>
+
+        <div className="stat-card">
+          <h4>Pages</h4>
+          <span>{pages.length}</span>
+        </div>
+
+      </div>
+    )}
+
+    {jobId && (
+      <div className="progress-section">
+
+        <div className="progress-header">
+          Crawl Progress
+        </div>
+
         <div className="progress-container">
           <div
             className="progress-bar"
             style={{ width: `${progress}%` }}
-          ></div>
+          />
         </div>
-        <p className="progress-text">{progress}%</p>
-      </div>
 
-      {pages.length > 0 && (
-        <>
-          <button onClick={sortByStatus}>
-            Sort by Status Code
+        <p>{progress}% Complete</p>
+
+      </div>
+    )}
+
+    {pages.length > 0 && (
+      <div className="results-card">
+
+        <div className="results-header">
+
+          <h2>Crawl Results</h2>
+
+          <button
+            className="sort-btn"
+            onClick={sortByStatus}
+          >
+            Sort Status
           </button>
 
-          <table>
+        </div>
+
+        <table>
           <thead>
             <tr>
               <th>URL</th>
               <th>Title</th>
               <th>H1</th>
-              <th>Status Code</th>
+              <th>Status</th>
             </tr>
           </thead>
 
@@ -195,12 +258,14 @@ function App() {
               </tr>
             ))}
           </tbody>
-          </table>
-  </>
-)}
 
-    </div>
-  );
+        </table>
+
+      </div>
+    )}
+
+  </div>
+);
 }
 
 export default App;
