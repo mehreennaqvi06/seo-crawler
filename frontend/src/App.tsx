@@ -254,7 +254,11 @@ function App() {
                 <td>{page.url}</td>
                 <td>{page.title}</td>
                 <td>{page.h1}</td>
-                <td>{page.status_code}</td>
+                <td>
+  {page.status_code === 429
+    ? "429 - Rate Limited"
+    : page.status_code}
+</td>
               </tr>
             ))}
           </tbody>
