@@ -99,6 +99,16 @@ def crawl_site(start_url, page_limit=5):
                 if meta and "content" in meta.attrs
                 else ""
             )
+            
+            images = soup.find_all("img")
+
+            total_images = len(images)
+
+            missing_alt = 0
+
+            for image in images:
+                if not image.get("alt"):
+                    missing_alt += 1
 
             results.append({
                 "url": str(response.url),
@@ -106,6 +116,8 @@ def crawl_site(start_url, page_limit=5):
                 "h1": h1_text,
                 "meta_description": meta_desc,
                 "status_code": response.status_code,
+                "total_images": total_images,
+                "missing_alt": missing_alt,
                 "timestamp": datetime.utcnow().isoformat()
             })
 

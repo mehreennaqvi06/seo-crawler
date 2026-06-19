@@ -82,6 +82,99 @@ def get_pages(job_id: int):
 
     return job["pages"]
 
+@app.get("/jobs/{job_id}/seo-score")
+def get_seo_score(job_id: int):
+
+    job = jobs.get(job_id)
+
+    if not job:
+        return {"error": "Job not found"}
+
+    total_score = 0
+    issues = []
+
+    for page in job["pages"]:
+
+        score = 0
+
+        if page["title"]:
+            score += 25
+        else:
+            issues.append(f"Missing title: {page['url']}")
+
+        if page["h1"]:
+            score += 25
+        else:
+            issues.append(f"Missing H1: {page['url']}")
+
+        if page["meta_description"]:
+            score += 25
+        else:
+            issues.append(
+                f"Missing meta description: {page['url']}"
+            )
+
+        if page["status_code"] == 200:
+            score += 25
+
+        total_score += score
+
+    average_score = (
+        total_score / len(job["pages"])
+        if job["pages"]
+        else 0
+    )
+
+    return {
+        "seo_score": round(average_score, 2),
+        "issues": issues
+    }
+    
+@app.get("/jobs/{job_id}/broken-links")
+def get_broken_links(job_id: int):
+
+    job = jobs.get(job_id)
+
+    if not job:
+        return {"error": "Job not found"}
+
+    broken_links = []
+
+    for page in job["pages"]:
+
+        if page["status_code"] >= 400:
+
+            broken_links.append({
+                "url": page["url"],
+                "status_code": page["status_code"]
+            })
+
+    return {
+        "broken_links": broken_links,
+        "count": len(broken_links)
+    }
+    
+@app.get("/jobs/{job_id}/images")
+def get_image_analysis(job_id: int):
+
+    job = jobs.get(job_id)
+
+    if not job:
+        return {"error": "Job not found"}
+
+    image_report = []
+
+    for page in job["pages"]:
+
+        image_report.append({
+            "url": page["url"],
+            "total_images": page.get("total_images", 0),
+            "missing_alt": page.get("missing_alt", 0)
+        })
+
+    return {
+        "pages": image_report
+    }
 
 @app.post("/process-next-job")
 def process_next_job():
