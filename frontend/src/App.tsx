@@ -9,6 +9,9 @@ function App() {
   const [status, setStatus] = useState("");
   const [pages, setPages] = useState<any[]>([]);
   const [progress, setProgress] = useState(0);
+  const [seoScore, setSeoScore] = useState<any>(null)
+  const [brokenLinks, setBrokenLinks] = useState<any>(null)
+  const [imageAnalysis, setImageAnalysis] = useState<any>(null)
 
   const startCrawl = async () => {
 
@@ -65,14 +68,32 @@ function App() {
   };
 
   const loadPages = async () => {
-    if (!jobId) return;
+  if (!jobId) return
 
-    const response = await axios.get(
-      `https://seo-crawler-production-b521.up.railway.app/jobs/${jobId}/pages`
-    );
+  const response = await axios.get(
+    `https://seo-crawler-production-b521.up.railway.app/jobs/${jobId}/pages`
+  )
 
-    setPages(response.data);
-  };
+  setPages(response.data)
+
+  const seoResponse = await axios.get(
+    `https://seo-crawler-production-b521.up.railway.app/jobs/${jobId}/seo-score`
+  )
+
+  setSeoScore(seoResponse.data)
+
+  const brokenResponse = await axios.get(
+    `https://seo-crawler-production-b521.up.railway.app/jobs/${jobId}/broken-links`
+  )
+
+  setBrokenLinks(brokenResponse.data)
+
+  const imageResponse = await axios.get(
+  `https://seo-crawler-production-b521.up.railway.app/jobs/${jobId}/images`
+)
+
+setImageAnalysis(imageResponse.data)
+}
 
   const sortByStatus = () => {
     const sorted = [...pages].sort(
@@ -221,6 +242,22 @@ function App() {
 
       </div>
     )}
+
+<div style={{ marginBottom: "20px" }}>
+  {seoScore && (
+    <h3>SEO Score: {seoScore.seo_score}</h3>
+  )}
+
+  {brokenLinks && (
+    <h3>Broken Links: {brokenLinks.count}</h3>
+  )}
+
+  {imageAnalysis && (
+    <h3>
+      Pages Analysed for Images: {imageAnalysis.pages.length}
+    </h3>
+  )}
+</div>
 
     {pages.length > 0 && (
       <div className="results-card">
