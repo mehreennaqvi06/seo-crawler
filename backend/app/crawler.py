@@ -26,6 +26,27 @@ def get_disallowed_paths(start_url):
             "disallowed": []
         }
 
+def check_sitemap(start_url):
+
+    try:
+        sitemap_url = urljoin(start_url, "/sitemap.xml")
+
+        response = httpx.get(
+            sitemap_url,
+            timeout=10
+        )
+
+        return {
+            "sitemap_url": sitemap_url,
+            "sitemap_found": response.status_code == 200,
+            "status_code": response.status_code
+        }
+
+    except Exception:
+        return {
+            "sitemap_found": False
+        }
+
 def crawl_site(start_url, page_limit=5):
 
     # BFS queue for graph traversal

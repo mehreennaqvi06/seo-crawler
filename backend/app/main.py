@@ -1,8 +1,12 @@
 import time
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.crawler import crawl_site
+from app.crawler import crawl_site, check_sitemap
 from collections import Counter
+from fastapi.responses import FileResponse
+import csv
+from reportlab.platypus import SimpleDocTemplate, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
 from app.database import (
     create_job_db,
     update_job_db,
@@ -45,6 +49,10 @@ def crawl(url: str, limit: int = 5):
         url,
         page_limit=limit
     )
+
+@app.get("/sitemap")
+def get_sitemap(url: str):
+    return check_sitemap(url)
 
 @app.post("/jobs")
 def create_job(url: str, limit: int = 5):
@@ -275,6 +283,29 @@ def robots_rules(url: str):
 
     return get_disallowed_paths(url)
 
+@app.get("/jobs/{job_id}/robots")
+def get_robots(job_id: int):
+
+    job = jobs.get(job_id)
+
+    if not job:
+        return {"error": "Job not found"}
+
+    return {
+        "allowed": job["allowed"],
+        "disallowed": job["disallowed"]
+    }
+
+@app.get("/jobs/{job_id}/sitemap-check")
+def sitemap_check(job_id: int):
+
+    job = jobs.get(job_id)
+
+    if not job:
+        return {"error": "Job not found"}
+
+    return check_sitemap(job["url"])
+
 @app.get("/metrics")
 def get_metrics():
     return get_metrics_db()
@@ -296,3 +327,98 @@ def get_history_job(job_id: int):
         return {"error": "Job not found"}
 
     return job
+
+@app.get("/jobs/{job_id}/export/csv")
+def export_csv(job_id: int):
+
+    job = jobs.get(job_id)
+
+    if not job:
+        return {"error": "Job not found"}
+
+    filename = f"crawl_{job_id}.csv"
+
+    with open(filename, "w", newline="", encoding="utf-8") as file:
+
+        writer = csv.writer(file)
+
+        writer.writerow([
+            "URL",
+            "Title",
+            "H1",
+            "Meta Description",
+            "Status Code"
+        ])
+
+        for page in job["pages"]:
+            writer.writerow([
+                page["url"],
+                page["title"],
+                page["h1"],
+                page["meta_description"],
+                page["status_code"]
+            ])
+
+    return FileResponse(
+        filename,
+        media_type="text/csv",
+        filename=filename
+    )
+
+@app.get("/jobs/{job_id}/export/pdf")
+def export_pdf(job_id: int):
+
+    job = jobs.get(job_id)
+
+    if not job:
+        return {"error": "Job not found"}
+
+    filename = f"crawl_{job_id}.pdf"
+
+    pdf = SimpleDocTemplate(filename)
+    styles = getSampleStyleSheet()
+
+    content = []
+
+    content.append(
+        Paragraph(
+            f"Crawl Report - Job {job_id}",
+            styles["Title"]
+        )
+    )
+
+    content.append(
+        Paragraph(
+            f"URL: {job['url']}",
+            styles["Normal"]
+        )
+    )
+
+    content.append(
+        Paragraph(
+            f"Pages Crawled: {len(job['pages'])}",
+            styles["Normal"]
+        )
+    )
+
+    for page in job["pages"]:
+
+        content.append(
+            Paragraph(
+                f"""
+                URL: {page['url']}<br/>
+                Title: {page['title']}<br/>
+                H1: {page['h1']}<br/>
+                Status: {page['status_code']}<br/><br/>
+                """,
+                styles["BodyText"]
+            )
+        )
+
+    pdf.build(content)
+
+    return FileResponse(
+        filename,
+        media_type="application/pdf",
+        filename=filename
+    )
