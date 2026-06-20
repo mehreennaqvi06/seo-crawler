@@ -2,12 +2,14 @@ import time
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.crawler import crawl_site
+from collections import Counter
 from app.database import (
     create_job_db,
     update_job_db,
     save_page_db,
     get_metrics_db,
-    get_all_jobs_db
+    get_all_jobs_db,
+    get_job_history_db
 )
 
 jobs = {}
@@ -176,6 +178,45 @@ def get_image_analysis(job_id: int):
         "pages": image_report
     }
 
+@app.get("/jobs/{job_id}/keywords")
+def get_keywords(job_id: int):
+
+    job = jobs.get(job_id)
+
+    if not job:
+        return {"error": "Job not found"}
+
+    words = []
+
+    for page in job["pages"]:
+
+        text = (
+            page["title"] + " " +
+            page["h1"] + " " +
+            page["meta_description"]
+        )
+
+        for word in text.lower().split():
+
+            word = word.strip(".,!?()[]{}:;\"'")
+
+            if len(word) > 3:
+                words.append(word)
+
+    keyword_counts = Counter(words)
+
+    top_keywords = keyword_counts.most_common(20)
+
+    return {
+        "keywords": [
+            {
+                "keyword": keyword,
+                "count": count
+            }
+            for keyword, count in top_keywords
+        ]
+    }
+
 @app.post("/process-next-job")
 def process_next_job():
 
@@ -241,3 +282,17 @@ def get_metrics():
 @app.get("/jobs")
 def get_jobs():
     return get_all_jobs_db()
+
+@app.get("/history")
+def get_history():
+    return get_all_jobs_db()
+
+@app.get("/history/{job_id}")
+def get_history_job(job_id: int):
+
+    job = get_job_history_db(job_id)
+
+    if not job:
+        return {"error": "Job not found"}
+
+    return job

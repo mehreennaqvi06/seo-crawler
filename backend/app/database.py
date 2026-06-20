@@ -163,6 +163,44 @@ def get_all_jobs_db():
         }
         for row in rows
     ]
+
+def get_job_history_db(job_id):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT
+            id,
+            url,
+            status,
+            pages_crawled,
+            crawl_duration_seconds,
+            error_count,
+            completed_at
+        FROM jobs
+        WHERE id = %s
+        """,
+        (job_id,)
+    )
+
+    row = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    if not row:
+        return None
+
+    return {
+        "id": row[0],
+        "url": row[1],
+        "status": row[2],
+        "pages_crawled": row[3],
+        "crawl_duration_seconds": row[4],
+        "error_count": row[5],
+        "completed_at": row[6]
+    }
     
 if __name__ == "__main__":
     conn = get_connection()
