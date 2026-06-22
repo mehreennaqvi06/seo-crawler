@@ -276,32 +276,45 @@ setRobotsData(robotsResponse.data)
       </div>
     )}
 
-<div style={{ marginBottom: "20px" }}>
+<div className="analytics-grid">
+
   {seoScore && (
-    <h3>SEO Score: {seoScore.seo_score}</h3>
+    <div className="analytics-card">
+      <h4>SEO Score</h4>
+      <h2>{seoScore.seo_score}</h2>
+    </div>
   )}
 
   {brokenLinks && (
-    <h3>Broken Links: {brokenLinks.count}</h3>
+    <div className="analytics-card">
+      <h4>Broken Links</h4>
+      <h2>{brokenLinks.count}</h2>
+    </div>
   )}
 
   {imageAnalysis && (
-    <h3>
-      Pages Analysed for Images: {imageAnalysis.pages.length}
-    </h3>
+    <div className="analytics-card">
+      <h4>Image Analysis</h4>
+      <h2>{imageAnalysis.pages.length}</h2>
+    </div>
   )}
 
   {sitemapData && (
-    <h3>
-      Sitemap Found: {sitemapData.sitemap_found ? "Yes" : "No"}
-    </h3>
+    <div className="analytics-card">
+      <h4>Sitemap</h4>
+      <h2>
+        {sitemapData.sitemap_found ? "Found" : "Not Found"}
+      </h2>
+    </div>
   )}
 
   {robotsData && (
-    <h3>
-      Blocked Paths: {robotsData.disallowed?.length || 0}
-    </h3>
+    <div className="analytics-card">
+      <h4>Blocked Paths</h4>
+      <h2>{robotsData.blocked_paths?.length || 0}</h2>
+    </div>
   )}
+
 </div>
 
     {pages.length > 0 && (
