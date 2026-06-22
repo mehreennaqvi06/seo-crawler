@@ -12,7 +12,9 @@ function App() {
   const [seoScore, setSeoScore] = useState<any>(null)
   const [brokenLinks, setBrokenLinks] = useState<any>(null)
   const [imageAnalysis, setImageAnalysis] = useState<any>(null)
-
+  const [sitemapData, setSitemapData] = useState<any>(null)
+  const [robotsData, setRobotsData] = useState<any>(null)
+ 
   const startCrawl = async () => {
 
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
@@ -89,10 +91,23 @@ function App() {
   setBrokenLinks(brokenResponse.data)
 
   const imageResponse = await axios.get(
-  `https://seo-crawler-production-b521.up.railway.app/jobs/${jobId}/images`
+    `https://seo-crawler-production-b521.up.railway.app/jobs/${jobId}/images`
+  )
+
+  setImageAnalysis(imageResponse.data)
+   
+  const sitemapResponse = await axios.get(
+  `https://seo-crawler-production-b521.up.railway.app/jobs/${jobId}/sitemap-check`
 )
 
-setImageAnalysis(imageResponse.data)
+setSitemapData(sitemapResponse.data)
+
+const robotsResponse = await axios.get(
+  `https://seo-crawler-production-b521.up.railway.app/jobs/${jobId}/robots`
+)
+
+setRobotsData(robotsResponse.data)
+
 }
 
   const sortByStatus = () => {
@@ -101,6 +116,24 @@ setImageAnalysis(imageResponse.data)
     );
 
     setPages(sorted);
+  };
+
+  const downloadCSV = () => {
+    if (!jobId) return;
+
+    window.open(
+      `https://seo-crawler-production-b521.up.railway.app/jobs/${jobId}/export/csv`,
+      "_blank"
+    );
+  };
+
+  const downloadPDF = () => {
+    if (!jobId) return;
+
+    window.open(
+      `https://seo-crawler-production-b521.up.railway.app/jobs/${jobId}/export/pdf`,
+      "_blank"
+    );
   };
 
   useEffect(() => {
@@ -257,6 +290,18 @@ setImageAnalysis(imageResponse.data)
       Pages Analysed for Images: {imageAnalysis.pages.length}
     </h3>
   )}
+
+  {sitemapData && (
+    <h3>
+      Sitemap Found: {sitemapData.sitemap_found ? "Yes" : "No"}
+    </h3>
+  )}
+
+  {robotsData && (
+    <h3>
+      Blocked Paths: {robotsData.disallowed?.length || 0}
+    </h3>
+  )}
 </div>
 
     {pages.length > 0 && (
@@ -264,16 +309,30 @@ setImageAnalysis(imageResponse.data)
 
         <div className="results-header">
 
-          <h2>Crawl Results</h2>
+  <h2>Crawl Results</h2>
 
-          <button
-            className="sort-btn"
-            onClick={sortByStatus}
-          >
-            Sort Status
-          </button>
+  <button
+    className="sort-btn"
+    onClick={sortByStatus}
+  >
+    Sort Status
+  </button>
 
-        </div>
+  <button
+    className="sort-btn"
+    onClick={downloadCSV}
+  >
+    Export CSV
+  </button>
+
+  <button
+    className="sort-btn"
+    onClick={downloadPDF}
+  >
+    Export PDF
+  </button>
+
+</div>
 
         <table>
           <thead>
@@ -310,4 +369,3 @@ setImageAnalysis(imageResponse.data)
 }
 
 export default App;
-
