@@ -14,6 +14,7 @@ function App() {
   const [imageAnalysis, setImageAnalysis] = useState<any>(null)
   const [sitemapData, setSitemapData] = useState<any>(null)
   const [robotsData, setRobotsData] = useState<any>(null)
+  const [keywords, setKeywords] = useState<any>(null);
  
   const startCrawl = async () => {
 
@@ -107,6 +108,12 @@ const robotsResponse = await axios.get(
 )
 
 setRobotsData(robotsResponse.data)
+
+const keywordResponse = await axios.get(
+  `https://seo-crawler-production-b521.up.railway.app/jobs/${jobId}/keywords`
+)
+
+setKeywords(keywordResponse.data)
 
 }
 
@@ -315,6 +322,13 @@ setRobotsData(robotsResponse.data)
     </div>
   )}
 
+  {keywords && (
+    <div className="analytics-card">
+      <h4>Keywords</h4>
+      <h2>{keywords.keywords?.length || 0}</h2>
+    </div>
+  )}
+
 </div>
 
     {pages.length > 0 && (
@@ -374,6 +388,30 @@ setRobotsData(robotsResponse.data)
 
         </table>
 
+      </div>
+    )}
+    
+    {keywords && (
+      <div className="results-card">
+        <h2>Keyword Analysis</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Keyword</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {keywords.keywords.map((item: any, index: number) => (
+              <tr key={index}>
+                <td>{item.keyword}</td>
+                <td>{item.count}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     )}
 
